@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
@@ -49,5 +51,17 @@ public class OrderService : IOrderService
         var order = new Order(basket.BuyerId, shippingAddress, items);
 
         await _orderRepository.AddAsync(order);
+        await UploadOrderAsync(order);
     }
+    private async Task UploadOrderAsync(Order order)
+    {
+        var body = order.ToJson<Order>();
+        HttpClient Client = new HttpClient();
+        var jsonContent = new StringContent(body, Encoding.UTF8, "application/json");
+        var response = await Client.PostAsync("http://localhost:7071/api/OrderUploader", jsonContent);
+        response.EnsureSuccessStatusCode();
+        var stringResponse = await response.Content.ReadAsStringAsync();
+    }
+
+
 }

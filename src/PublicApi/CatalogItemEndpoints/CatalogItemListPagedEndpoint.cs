@@ -50,7 +50,7 @@ public class CatalogItemListPagedEndpoint : IEndpoint<IResult, ListPagedCatalogI
 
         _logger.LogWarning("Catalog capacity_03 : {0}", totalItems);
 
-        throw new Exception("Cannot move further");
+        //throw new Exception("Cannot move further");
  
         var pagedSpec = new CatalogFilterPaginatedSpecification(
             skip: request.PageIndex.Value * request.PageSize.Value,
