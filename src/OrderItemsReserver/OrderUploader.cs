@@ -17,7 +17,7 @@ namespace OrderItemsReserver
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            string connectionString = "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=karafuterstacc2;AccountKey=Dggw0L3mwCamJXyA6lKtRUIKodUHoFj3j19i2JjFhHoJrS15nzHsY9EEZeofbXY9Q9dbd3NgghFG+AStGVWHUQ==;BlobEndpoint=https://karafuterstacc2.blob.core.windows.net/;FileEndpoint=https://karafuterstacc2.file.core.windows.net/;QueueEndpoint=https://karafuterstacc2.queue.core.windows.net/;TableEndpoint=https://karafuterstacc2.table.core.windows.net/";
+            string connectionString = "connectionString";
             string fileContainerName = "files";
 
             log.LogInformation("C# HTTP trigger function processed a request.");
