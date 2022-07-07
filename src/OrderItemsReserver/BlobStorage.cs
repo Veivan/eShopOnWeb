@@ -26,6 +26,8 @@ internal class BlobStorage
 
     public Task Save(Stream data, string name)
     {
+        data.Position = 0;
+
         BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
 
         // Get the container (folder) the file will be saved in

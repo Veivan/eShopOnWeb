@@ -58,7 +58,9 @@ public class OrderService : IOrderService
         var body = order.ToJson<Order>();
         HttpClient Client = new HttpClient();
         var jsonContent = new StringContent(body, Encoding.UTF8, "application/json");
-        var response = await Client.PostAsync("http://localhost:7071/api/OrderUploader", jsonContent);
+        //var url = "http://localhost:7071/api/OrderUploader";
+        var url = "https://orderuploaderapp.azurewebsites.net/api/OrderUploader";
+        var response = await Client.PostAsync(url, jsonContent);
         response.EnsureSuccessStatusCode();
         var stringResponse = await response.Content.ReadAsStringAsync();
     }
