@@ -59,7 +59,9 @@ public class OrderService : IOrderService
         HttpClient Client = new HttpClient();
         var jsonContent = new StringContent(body, Encoding.UTF8, "application/json");
         //var url = "http://localhost:7071/api/OrderUploader";
-        var url = "https://orderuploaderapp.azurewebsites.net/api/OrderUploader";
+        //var url = "https://orderuploaderapp.azurewebsites.net/api/OrderUploader";
+        //var url = "http://localhost:7062/api/OrderSaver";
+        var url = "https://ordersaverfunc20220714012345.azurewebsites.net/api/OrderSaver";
         var response = await Client.PostAsync(url, jsonContent);
         response.EnsureSuccessStatusCode();
         var stringResponse = await response.Content.ReadAsStringAsync();
