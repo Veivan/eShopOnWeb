@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
+using Azure.Messaging.ServiceBus;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Microsoft.eShopWeb.ApplicationCore.Entities.BasketAggregate;
 using Microsoft.eShopWeb.ApplicationCore.Entities.OrderAggregate;
@@ -51,7 +52,9 @@ public class OrderService : IOrderService
         var order = new Order(basket.BuyerId, shippingAddress, items);
 
         await _orderRepository.AddAsync(order);
-        await UploadOrderAsync(order);
+
+        //await UploadOrderAsync(order);
+        await SendOrderMessageAsync(order);
     }
     private async Task UploadOrderAsync(Order order)
     {
@@ -67,5 +70,29 @@ public class OrderService : IOrderService
         var stringResponse = await response.Content.ReadAsStringAsync();
     }
 
+    private async Task SendOrderMessageAsync(Order order)
+    {
+        const string ServiceBusConnectionString = "Endpoint=sb://karafsbusns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=IN7iq/kKgdTbZC9R8ag9t6HpckzTOAVUazQqnKO/v2U=";
+        const string QueueName = "orders";
 
+        await using var client = new ServiceBusClient(ServiceBusConnectionString);
+
+        await using ServiceBusSender sender = client.CreateSender(QueueName);
+        try
+        {
+            var body = order.ToJson<Order>();
+            var message = new ServiceBusMessage(body);
+            await sender.SendMessageAsync(message);
+        }
+        catch (System.Exception exception)
+        {
+        }
+        finally
+        {
+            // Calling DisposeAsync on client types is required to ensure that network
+            // resources and other unmanaged objects are properly cleaned up.
+            await sender.DisposeAsync();
+            await client.DisposeAsync();
+        }
+    }
 }
