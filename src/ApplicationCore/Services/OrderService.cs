@@ -72,7 +72,7 @@ public class OrderService : IOrderService
 
     private async Task SendOrderMessageAsync(Order order)
     {
-        const string ServiceBusConnectionString = "Endpoint=sb://karafsbusns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=IN7iq/kKgdTbZC9R8ag9t6HpckzTOAVUazQqnKO/v2U=";
+        const string ServiceBusConnectionString = "Endpoint=sb://karafsbusns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=ggPf/YeJV6HW/xYAyxi/3e66MeuoNYnUOlLxncVtlIo=";
         const string QueueName = "orders";
 
         await using var client = new ServiceBusClient(ServiceBusConnectionString);
