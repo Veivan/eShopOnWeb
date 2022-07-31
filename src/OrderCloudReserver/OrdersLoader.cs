@@ -9,6 +9,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Polly;
 
 namespace OrderCloudReserver
 {
@@ -20,39 +21,43 @@ namespace OrderCloudReserver
             dynamic data = JsonConvert.DeserializeObject(myQueueItem);
             string strId = data?.Id;
 
+            var policy = Policy
+                .Handle<Exception>()
+                .RetryAsync(2);
+
             if (!string.IsNullOrEmpty(strId))
             {
-                bool taskIsOk = await Save2Blob(myQueueItem, strId);
-                if (!taskIsOk)
+                try 
+                {
+                    await policy.ExecuteAsync(() => Save2Blob(myQueueItem, strId));
+                }
+                catch
                 {
                     await Send2Fail(myQueueItem);
                 }
             }
-                var responseMessage = $"C# ServiceBus queue trigger function processed message: {myQueueItem}";
+            var responseMessage = $"C# ServiceBus queue trigger function processed message: {myQueueItem}";
             log.LogInformation(responseMessage);
         }
 
-        private async Task<bool> Save2Blob(string myQueueItem, string strId)
+        private async Task Save2Blob(string myQueueItem, string strId)
         {
-            string connectionStringBlob = "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=karafstacc;AccountKey=Zt+8SCn9pzyuaKmKuLh5aaCZeOAxTnszViOvaWLq86KrzfdIvSvhMygBfdNIdaRXd5owvZNBvU0/+AStE2fsiw==;BlobEndpoint=https://karafstacc.blob.core.windows.net/;FileEndpoint=https://karafstacc.file.core.windows.net/;QueueEndpoint=https://karafstacc.queue.core.windows.net/;TableEndpoint=https://karafstacc.table.core.windows.net/";
+            var config = new ConfigurationBuilder()
+           .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+           .AddEnvironmentVariables()
+           .Build();
+
+            string connectionStringBlob = config["ConnectionStringBlob"];
+
             string fileContainerName = "orders";
 
-            var result = false;
-            try
-            {
-                var blobStorage = new BlobStorage(connectionStringBlob, fileContainerName);
-                blobStorage.Initialize().GetAwaiter().GetResult();
+            var blobStorage = new BlobStorage(connectionStringBlob, fileContainerName);
+            blobStorage.Initialize().GetAwaiter().GetResult();
 
-                byte[] byteArray = Encoding.ASCII.GetBytes(myQueueItem);
-                MemoryStream stream = new MemoryStream(byteArray);
+            byte[] byteArray = Encoding.ASCII.GetBytes(myQueueItem);
+            MemoryStream stream = new MemoryStream(byteArray);
 
-                await blobStorage.Save(stream, strId);
-                result = true;
-            }
-            catch
-            {
-            }
-            return result;
+            await blobStorage.Save(stream, strId);
         }
 
         private async Task Send2Fail(string myQueueItem)
