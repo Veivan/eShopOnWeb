@@ -23,6 +23,14 @@
       "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
     },
     {
+      "library": "jquery-validate@1.17.0",
+      "destination": "wwwroot/lib/jquery-validate/",
+      "files": [
+        "jquery.validate.min.js",
+        "jquery.validate.js"
+      ]
+    },
+    {
       "library": "toastr.js@2.1.4",
       "destination": "wwwroot/lib/toastr/"
     },

@@ -84,8 +84,6 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
-builder.Services.AddApplicationInsightsTelemetry();
-
 
 builder.Services.AddMediatR(typeof(CatalogItem).Assembly);
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
@@ -184,9 +182,6 @@ app.UseEndpoints(endpoints =>
 
 app.MapEndpoints();
 app.Logger.LogInformation("LAUNCHING PublicApi");
-
-//throw new Exception("Cannot start");
-
 app.Run();
 
 public partial class Program { }
