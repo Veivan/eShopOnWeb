@@ -16,7 +16,7 @@ namespace OrderSaverFunc
     public static class OrderSaver
     {
         private static readonly string _endpointUri = "https://karafcosmos.documents.azure.com:443/";
-        private static readonly string _primaryKey = "_primaryKey";
+        private static readonly string _primaryKey = "4FOVVtjhxkPFqBMiVz22MhWu11zRXM9m8MVzqdNm11cEJqgtdj9xHY8oIBD6u0LooUTk7trCEC8vFedWTpW3Ww==";
         private static readonly string databaseName = "OrdersDB";
         private static readonly string collectionName = "FilledOrders";
 
@@ -35,7 +35,7 @@ namespace OrderSaverFunc
                 if (data != null)
                 {
                     data.FinalPrice = data.Total();
-                    await CreateUserDocumentIfNotExists(databaseName, collectionName, data);
+                    await CreateUserDocumentIfNotExists(databaseName, collectionName, data, log);
                     responseMessage = $"Order ID = {data.Id}. This HTTP triggered function executed successfully.";
                 }
             }
@@ -47,7 +47,7 @@ namespace OrderSaverFunc
             return new OkObjectResult(responseMessage);
         }
 
-        private static async Task CreateUserDocumentIfNotExists(string databaseName, string collectionName, Order order)
+        private static async Task CreateUserDocumentIfNotExists(string databaseName, string collectionName, Order order, ILogger log)
         {
             using (CosmosClient client = new CosmosClient(_endpointUri, _primaryKey))
             {
@@ -58,10 +58,12 @@ namespace OrderSaverFunc
 
                     // Read the item to see if it exists
                     ItemResponse<Order> response = await container.ReadItemAsync<Order>(order.Id, new PartitionKey(order.Id));
+                    log.LogInformation($"Exists - {order.Id}.");
                 }
                 catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
                 {
                     ItemResponse<Order> response = await container.CreateItemAsync<Order>(order, new PartitionKey(order.Id));
+                    log.LogInformation($"New - {order.Id}.");
                 }
 
             }

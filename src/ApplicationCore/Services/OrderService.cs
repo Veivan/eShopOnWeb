@@ -53,7 +53,7 @@ public class OrderService : IOrderService
 
         await _orderRepository.AddAsync(order);
 
-        //await UploadOrderAsync(order);
+        await UploadOrderAsync(order);
         await SendOrderMessageAsync(order);
     }
     private async Task UploadOrderAsync(Order order)
@@ -64,7 +64,7 @@ public class OrderService : IOrderService
         //var url = "http://localhost:7071/api/OrderUploader";
         //var url = "https://orderuploaderapp.azurewebsites.net/api/OrderUploader";
         //var url = "http://localhost:7062/api/OrderSaver";
-        var url = "https://ordersaverfunc20220714012345.azurewebsites.net/api/OrderSaver";
+        var url = "https://ordersaverfunc.azurewebsites.net/api/OrderSaver";
         var response = await Client.PostAsync(url, jsonContent);
         response.EnsureSuccessStatusCode();
         var stringResponse = await response.Content.ReadAsStringAsync();
@@ -72,7 +72,7 @@ public class OrderService : IOrderService
 
     private async Task SendOrderMessageAsync(Order order)
     {
-        const string ServiceBusConnectionString = "Endpoint=sb://karafsbusns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=mTVVHPe/1OobK7LVr38LowTK3y/pJFBTiBMUfNpN4vw=";
+        const string ServiceBusConnectionString = "Endpoint=sb://karafsbusns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=c8rqxdMMwLudrWKpglsBzf1j6i8XKm7fGQ4qQEW2WMY=";
         const string QueueName = "orders";
 
         await using var client = new ServiceBusClient(ServiceBusConnectionString);
